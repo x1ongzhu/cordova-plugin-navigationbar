@@ -1,0 +1,23 @@
+{
+    "name": "cordova-plugin-navigationbar",
+    "version": "1.0.0",
+    "description": "A cordova plugin",
+    "scripts": {},
+    "repository": {
+        "type": "git",
+        "url":
+            "git+https://github.com/x1ongzhu/cordova-plugin-navigationbar.git"
+    },
+    "keywords": ["cordova"],
+    "author": "x1ongzhu",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/x1ongzhu/cordova-plugin-navigationbar/issues"
+    },
+    "homepage":
+        "https://github.com/x1ongzhu/cordova-plugin-navigationbar#readme",
+    "cordova": {
+        "id": "cordova-plugin-wechat",
+        "platforms": ["android","ios"]
+    }
+}
