@@ -1,9 +1,13 @@
 /********* navigationbar.m Cordova Plugin Implementation *******/
 
 #import <Cordova/CDV.h>
+#import <objc/runtime.h>
+
+static const void *kHideStatusBar = &kHideStatusBar;
+static const void *kStatusBarStyle = &kStatusBarStyle;
 
 @interface navigationbar : CDVPlugin<UINavigationBarDelegate> {
-  // Member variables go here.
+    // Member variables go here.
 }
 
 @property (nonatomic, strong) UINavigationBar *navBar;
@@ -21,6 +25,31 @@
 - (void)hideBack:(CDVInvokedUrlCommand*)command;
 @end
 
+@interface CDVViewController (StatusBar)
+
+@property (nonatomic, retain) id sb_statusBarStyle;
+
+@end
+
+@implementation CDVViewController (StatusBar)
+
+@dynamic sb_statusBarStyle;
+
+- (id)sb_statusBarStyle {
+    return objc_getAssociatedObject(self, kStatusBarStyle);
+}
+
+- (void)setSb_statusBarStyle:(id)newStatusBarStyle {
+    objc_setAssociatedObject(self, kStatusBarStyle, newStatusBarStyle, OBJC_ASSOCIATION_RETAIN_NONATOMIC);
+}
+
+- (UIStatusBarStyle)preferredStatusBarStyle
+{
+    return (UIStatusBarStyle)[self.sb_statusBarStyle intValue];
+}
+
+@end
+
 @implementation navigationbar
 
 - (void)create:(CDVInvokedUrlCommand*)command{
@@ -32,7 +61,8 @@
         _navigationItem = [[UINavigationItem alloc] initWithTitle:@""];
         NSArray *items = [[NSArray alloc] initWithObjects:_navigationItem,nil,nil];
         [_navBar setItems:items animated:NO];
-        [self.webView.superview addSubview:_navBar];
+        //        [self.webView.superview addSubview:_navBar];
+        [self.webView.superview insertSubview:_navBar atIndex:0];
         [self.webView setFrame:CGRectMake(0, 44 + 20, [UIScreen mainScreen].bounds.size.width, [UIScreen mainScreen].bounds.size.height - 64)];
     }
 }
@@ -64,10 +94,15 @@
         if ([@"light" isEqualToString:[style lowercaseString] ]) {
             [_navBar setTintColor:[UIColor whiteColor]];
             [_navBar setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
-
+            CDVViewController* vc = (CDVViewController*)self.viewController;
+            vc.sb_statusBarStyle = [NSNumber numberWithInt:UIStatusBarStyleLightContent];
+            [self.viewController setNeedsStatusBarAppearanceUpdate];
         }else if ([@"dark" isEqualToString:[style lowercaseString] ]) {
             [_navBar setTintColor:[UIColor blackColor]];
             [_navBar setTitleTextAttributes:@{NSForegroundColorAttributeName:[UIColor whiteColor]}];
+            CDVViewController* vc = (CDVViewController*)self.viewController;
+            vc.sb_statusBarStyle = [NSNumber numberWithInt:UIStatusBarStyleDefault];
+            [self.viewController setNeedsStatusBarAppearanceUpdate];
         }
     }
 }
@@ -99,7 +134,7 @@
 }
 
 -(void)click:(UIButton *)button{
-    [self.webViewEngine evaluateJavaScript:@"history.go(1);" completionHandler:^(id res, NSError * error) {
+    [self.webViewEngine evaluateJavaScript:@"history.go(-1);" completionHandler:^(id res, NSError * error) {
         
     }];
 }
@@ -108,13 +143,13 @@
 {
     CDVPluginResult* pluginResult = nil;
     NSString* echo = [command.arguments objectAtIndex:0];
-
+    
     if (echo != nil && [echo length] > 0) {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:echo];
     } else {
         pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
     }
-
+    
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
@@ -152,3 +187,4 @@
 }
 
 @end
+

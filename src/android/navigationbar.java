@@ -6,14 +6,11 @@ import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.Window;
-import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.izouma.lingxiancar.R;
 
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
@@ -21,8 +18,6 @@ import org.apache.cordova.CallbackContext;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * This class echoes a string called from JavaScript.
@@ -82,15 +77,13 @@ public class navigationbar extends CordovaPlugin {
         navBar.addView(title);
 
         ivBack = new ImageView(cordova.getActivity());
-        ivBack.setImageResource(R.drawable.icon_back_dark);
+        ivBack.setImageResource(cordova.getActivity().getResources().getIdentifier("icon_back_dark", "drawable", cordova.getActivity().getPackageName()));
         RelativeLayout.LayoutParams backParam = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
         backParam.addRule(RelativeLayout.ALIGN_PARENT_LEFT);
         backParam.addRule(RelativeLayout.CENTER_VERTICAL);
         ivBack.setLayoutParams(backParam);
-        ivBack.setPadding((int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, cordova.getActivity().getResources().getDisplayMetrics()),
-                0,
-                (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, cordova.getActivity().getResources().getDisplayMetrics()),
-                0);
+        int padding = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 15, cordova.getActivity().getResources().getDisplayMetrics());
+        ivBack.setPadding(padding, padding, padding, padding);
         ivBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -177,10 +170,10 @@ public class navigationbar extends CordovaPlugin {
             String style = args.getString(0);
             if ("light".equals(style.toLowerCase())) {
                 title.setTextColor(Color.WHITE);
-                ivBack.setImageResource(R.drawable.icon_back_light);
+                ivBack.setImageResource(cordova.getActivity().getResources().getIdentifier("icon_back_light", "drawable", cordova.getActivity().getPackageName()));
             } else if ("dark".equals(style.toLowerCase())) {
                 title.setTextColor(Color.BLACK);
-                ivBack.setImageResource(R.drawable.icon_back_dark);
+                ivBack.setImageResource(cordova.getActivity().getResources().getIdentifier("icon_back_dark", "drawable", cordova.getActivity().getPackageName()));
             }
         } catch (JSONException e) {
             e.printStackTrace();
